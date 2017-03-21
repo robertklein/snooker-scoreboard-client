@@ -1,0 +1,74 @@
+
+body, html { padding:0; margin:0; font-family:verdana; background:#1D5703; }
+.ct { width:1600px; margin:5px; }
+input { font-size:24px; padding:5px; opacity:0.1; }
+
+
+/* scoreboard stream */
+.sb { display:none; width:1600px; height:56px; background:#961111; color:#fff; position:relative; margin-bottom:40px; }
+
+.sb .player-1 { width:800px; float:left; }
+.sb .player-1 > * { float:left; }
+.sb .player-1 .name { float:left; width:530px; font-size:30px; font-weight:bold; padding:10px; text-align:center; background:transparent; }
+.sb .player-1 .points { float:left; width:150px; height: 62px; line-height: 62px; font-size: 60px; font-weight:bold; padding:10px 0; text-align:center; background:#ddd; color:#444; }
+.sb .player-1 .frame { float:left; width:80px; height:36px; font-size:22px; line-height:36px; font-weight:bold; padding:10px 20px 10px 0; text-align:center; background:#750707; color:#ddd; }
+.sb .player-1 .break { background:#888; color:#ddd; position:absolute; top:56px; left:0px; width:545px; height:20px; font-size:22px; line-height:36px; font-weight:bold; padding:3px 5px 3px 0; text-align:right; }
+
+.sb .player-2 { width:800px; float:right; }
+.sb .player-2 .name { float:right; width:530px; font-size:30px; font-weight:bold; padding:10px; text-align:center; background:transparent; }
+.sb .player-2 .points { float:right; width:150px; height:62px; line-height:62px; font-size:60px; font-weight:bold; padding:10px 0; text-align:center; background:#ddd; color:#444; }
+.sb .player-2 .frame { float:right; width:80px; height:36px; font-size:22px; line-height:36px; font-weight:bold; padding:10px 0px 10px 20px; text-align:center; background:#750707; color:#ddd; }
+.sb .player-2 .break { background:#888; color:#ddd; position:absolute; top:56px; left:1050px; width:545px; height:20px; font-size:22px; line-height:36px; font-weight:bold; padding:3px 0 3px 5px; text-align:left; }
+
+.sb .frames { position:absolute; width:40px; font-size:18px; font-weight:normal; top:16px; left:780px; background:transparent; text-align:center; }
+/*.sb .playing { position:absolute; width:20px; height:56px; top:0px; left:0px; background:yellow; }*/
+.sb .playing { position:absolute; top:0px; left:0px; width: 0; height: 0; border-style: solid; border-width: 28px 0 28px 28px; border-color: transparent transparent transparent yellow; }
+.sb .playing.playing-1 { left:1573px; border-width: 28px 28px 28px 0; border-color: transparent yellow transparent transparent; }
+
+
+/* scoreboard display */
+.sb1 { display:none; width:100%; position:relative;  }
+
+.sb1 .player-1 { width:50%; float:left; }
+.sb1 .player-1 .name { height:60px; text-align:center; line-height:60px; font-size:60px; font-weight:bold; padding:20px; background:#f00; display:block; background:#961111; color:#fff; overflow:hidden; }
+.sb1 .player-1 .points { height:320px; text-align:right; line-height:320px; font-size:320px; font-weight:bold; padding:0 120px 0 20px; background:#f00; display:block; background:#ddd; color:#222; }
+.sb1 .player-1 .frame { height:150px; text-align:right; line-height:150px; font-size:150px; font-weight:bold; padding:0px 230px 0px 20px; background:#f00; display:block; background:#ddd; color:#222; }
+.sb1 .player-1 .break { background:#888; color:#ddd; height:50px; font-size:50px; line-height:50px; font-weight:bold; padding:3px 5px 3px 0; text-align:right; display:block; }
+
+.sb1 .player-2 { width:50%; float:right; }
+.sb1 .player-2 .name { height:60px; text-align:center; line-height:60px; font-size:60px; font-weight:bold; padding:20px; background:#f00; display:block; background:#961111; color:#fff; overflow:hidden; }
+.sb1 .player-2 .points { height:320px; text-align:left; line-height:320px; font-size:320px; font-weight:bold; padding:0 20px 0 80px; background:#f00; display:block; background:#ddd; color:#222; }
+.sb1 .player-2 .frame { height:150px; text-align:left; line-height:150px; font-size:150px; font-weight:bold; padding:0px 20px 0px 230px; background:#f00; display:block; background:#ddd; color:#222; }
+.sb1 .player-2 .break { background:#888; color:#ddd; height:50px; font-size:50px; line-height:50px; font-weight:bold; padding:3px 0 3px 5px; text-align:left; display:block; }
+
+.sb1 .frames { position:absolute; width:400px; font-size:120px; font-weight:normal; top:425px; left:600px; background:transparent; text-align:center; color:#222; }
+.sb1 .playing { position:absolute; top:0px; left:750px; width: 0; height: 0; border-style: solid; border-width: 50px 50px 50px 0; border-color: transparent yellow transparent transparent; }
+.sb1 .playing.playing-1 { left:800px; border-width: 50px 0 50px 50px; border-color: transparent transparent transparent yellow; }
+
+
+.ic { margin:0 auto; text-align:center; }
+.tb1 { width:100%; border-spacing:0; border-collapse:collapse; }
+.tb1 td { width:50%; }
+.tb1 td.right { text-align:right; }
+.ball { float:left; padding:10px; }
+.ball.bf1, .ball.bf5, .ball.bf6, .ball.bf7 { background:#444; }
+.ball > div { width:74px; height:74px; background:#aaa; border-radius:37px; cursor:pointer; padding:0px; }
+.breakball { float:none; width:20px; height:20px; border-radius:10px; background:#aaa; cursor:pointer; padding:0px; margin:0 1px; display:inline-block; line-height:20px; }
+.sb1 .breakball { width:50px; height:50px; border-radius:25px; line-height:50px; }
+.b1 > div, .br1, .bf1 > div { background:#C40000; }
+.b2 > div, .br2 { background:#EDED2F; }
+.b3 > div, .br3 { background:#34A300; }
+.b4 > div, .br4, .bf4 > div { background:#8F4C00; }
+.b5 > div, .br5, .bf5 > div { background:#123DFF; }
+.b6 > div, .br6, .bf6 > div { background:#FF91D9; }
+.b7 > div, .br7, .bf7 > div { background:#000; }
+
+.frame-points { color:#fff; }
+.frame-points span { color:#fff; }
+
+.table-info { }
+.break-word-ct { float:left; width:27%; color:#fff; }
+.break-word-ct span { font-size:120px; font-weight:bold; }
+.ahead-remaining-ct { float:left; width:46%; color:#fff; text-align:center; display:none; font-size:120px; font-weight:bold; }
+.red-on-the-table-ct { float:right; width:27%; color:#fff; text-align:right; }
+.red-on-the-table-ct span { font-size:120px; font-weight:bold; }

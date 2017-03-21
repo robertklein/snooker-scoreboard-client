@@ -1,0 +1,7 @@
+
+body, html { padding:0; margin:0; font-family:verdana; background:#1D5703; background:#fff; }
+
+.t-ct { border-spacing:0; border-collapse:collapse; margin:0; width:100%; table-layout:fixed; }
+.t-ct td { padding:5px; font-size:42px; font-weight:bold; border:1px solid #ccc; min-width:90px; height:50px; text-align:center; vertical-align:middle; }
+.t-ct td.total-td { background:#eee; }
+.info-stats { font-size:28px; font-weight:bold; }
