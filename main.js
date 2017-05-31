@@ -4,6 +4,97 @@ String.prototype.latinize=String.prototype.latinise;
 String.prototype.isLatin=function(){return this===this.latinise();};
 
 var game = {
+    time: {
+        start: {
+            game: 0,
+            frame: 0,
+            turn: 0,
+            shot: 0
+        },
+        interval: {
+            pointer: null,
+            start: function(){
+                this.pointer = setInterval(function(){ game.time.interval.handle() }, 1000);
+            },
+            end: function(){
+                clearInterval(game.time.interval.pointer);
+            },
+            handle: function(){
+                var now = game.time.now();
+                $('.timer-ct .timer-game .value').text(game.time.eval('game', now-game.time.start.game));
+                $('.timer-ct .timer-frame .value').text(game.time.eval('frame', now-game.time.start.frame));
+                $('.timer-ct .timer-turn .value').text(game.time.eval('turn', now-game.time.start.turn));
+                $('.timer-ct .timer-shot .value').text(game.time.eval('shot', now-game.time.start.shot));
+            }
+        },
+        eval: function(type, milisec){
+            var tmp = parseInt(milisec / 1000);
+            var opacity = 0;
+
+            if(type == 'shot'){
+                opacity = (tmp - 20) / 40;
+                opacity = Math.max(0, Math.min(1, opacity));
+                $('.timer-ct .timer-'+type).css('background', 'rgba(255,255,255,'+opacity+')');
+            } else if(type == 'frame'){
+                opacity = (tmp - 1200) / 1280;
+                opacity = Math.max(0, Math.min(1, opacity));
+                $('.timer-ct .timer-'+type).css('background', 'rgba(255,255,255,'+opacity+')');
+            }
+
+            return this.formatter.get(type, tmp);
+        },
+        formatter: {
+            twoDec: function(input){
+                return input < 10 ? '0'+input.toString() : input.toString();
+            },
+            get: function(type, sec){
+                var d = 0;
+                var h = 0;
+                var m = 0;
+                var s = 0;
+                d = parseInt(sec / 86400);
+                sec = sec % 86400;
+                h = parseInt(sec / 3600);
+                sec = sec % 3600;
+                m = parseInt(sec / 60);
+                s = sec % 60;
+
+                if(d) return 'more than day';
+
+                var t = '';
+                /*
+                if(h) t += (t.length ? ' ' : '') + h + 'h';
+                if(m) t += (t.length ? ' ' : '') + m + 'm';
+                if(s) t += (t.length ? ' ' : '') + s + 's';
+                */
+                if(h) t += (t.length ? '' : '') + this.twoDec(h);
+                t += (t.length ? ':' : '') + this.twoDec(m);
+                t += (t.length ? ':' : '00:') + this.twoDec(s);
+
+                return t;
+            },
+        },
+        events: {
+            startGame: function(){
+                game.time.start.game = game.time.now();
+                this.newFrame();
+            },
+            newFrame: function(){
+                game.time.start.frame = game.time.now();
+                this.changePlayer();
+            },
+            changePlayer: function(){
+                game.time.start.turn = game.time.now();
+                this.playerShot();
+            },
+            playerShot: function(){
+                game.time.start.shot = game.time.now();
+            }
+        },
+        now: function(){
+            return Date.now();
+        }
+    },
 	score: [0,0],
 	scoreTotal: [0,0],
 	bestOf: 5,
@@ -133,19 +224,7 @@ var game = {
 		if(audio.type == 'word'){ file = audio.name; }
 		if(audio.type == 'player'){
 			//console.log(audio.name);
-			if(['daniel_topoli',
-				'slavomir_hrusovsky',
-				'marek_repko',
-                'edmund_kovac',
-				'frantisek_tabak',
-				'tomas_ratkovsky',
-				'tomas_podolinsky',
-				'player_two',
-				'player_one',
-				'richard_bdzoch',
-				'robert_klein',
-				'peter_klein',
-				'lubomir_bagar'].indexOf(audio.name) !== -1)
+			if(game.player.keys().indexOf(audio.name) !== -1)
 				file = 'players/'+audio.name;
 			else
 				file = 'players/'+audio.alt;
@@ -221,17 +300,101 @@ var game = {
 			t += '<span>' + j[0] + ':' + j[1] + '</span>';
 		});
 		$('.frame-points').html(t);
-	}
+	},
+    player: {
+        _list: {
+            'robert_klein': 'Róbert KLEIN',
+            'richard_bdzoch': 'Richard BDŽOCH',
+            'lubomir_bagar': 'Ľubomír BAGAR',
+            'peter_klein': 'Peter KLEIN',
+            'tomas_podolinsky': 'Tomáš PODOLINSKÝ',
+            'slavomir_hrusovsky': 'Slavomír HRUŠOVSKÝ',
+            'tomas_ratkovsky': 'Tomáš RATKOVSKÝ',
+            'frantisek_tabak': 'František TABAK',
+            'edmund_kovac': 'Edmund KOVÁČ',
+            'daniel_topoli': 'Daniel TOPOLI',
+            'marek_repko': 'Marek REPKO',
+            'player_one': 'Player ONE',
+            'player_two': 'Player TWO'
+        },
+        keys: function(){
+            var t = [];
+            $.each(game.player._list, function(a,b){
+                t.push(a);
+            });
+            return t;
+        },
+        slugify: function(player_name){
+            return player_name.latinise().replace(' ', '_');
+        },
+        dialog: {
+            autocomplete: {
+                source: null,
+                prepare: function(val){
+                    var t = '';
+                    var list = {};
+                    if(val == ''){
+                        list = game.player._list;
+                    }
+                    $.each(list, function(a,b){
+                        t += '<li rel="'+a+'">'+b+'</li>';
+                    });
+                    $('.player-autocomplete-ct ul').html(t);
+                    this.setPosition();
+                },
+                setPosition: function(){
+                    if(this.source){
+                        var pos = this.source.get(0).getBoundingClientRect();
+                        $('.player-autocomplete-ct').css({ top:pos.top + 50, left:pos.left });
+                    }
+                },
+                show: function(input_text_element){
+                    this.source = input_text_element;
+                    $('.player-autocomplete-ct').addClass('active');
+                    this.setPosition();
+                },
+                hide: function(){
+                    setTimeout(function(){
+                        this.source = null;
+                        $('.player-autocomplete-ct').removeClass('active');
+                    }, 200);
+                },
+                select(key){
+                    this.source.val(game.player._list[key]);
+                    this.source.trigger('change');
+                    this.hide();
+                }
+            }
+        }
+    }
 };
+
+game.time.events.startGame();
+game.time.interval.start();
+
+$(document).on('click', '.player-autocomplete-ct ul li', function(){
+    game.player.dialog.autocomplete.select($(this).attr('rel'));
+});
+$(document).on('blur', 'input[name="n1"], input[name="n2"], input[name="ft"]', function(){
+    game.player.dialog.autocomplete.hide();
+});
+$(document).on('focus', 'input[name="n1"], input[name="n2"], input[name="ft"]', function(){
+    game.player.dialog.autocomplete.prepare($(this).val());
+    game.player.dialog.autocomplete.show($(this));
+});
 
 $(document).on('change', 'input[name="n1"], input[name="n2"], input[name="ft"]', function(){
 	if($(this).attr('name') == 'n1') $('.n1').text($(this).val());
 	if($(this).attr('name') == 'n2') $('.n2').text($(this).val());
-	if($(this).attr('name') == 'ft') $('.ft').text($(this).val());
+	if($(this).attr('name') == 'ft'){
+        $('.ft').text($(this).val());
+        game.bestOf = parseInt($(this).val());
+    }
 });
 
 $(document).on('click', '.next-frame-bt', function(e){
 	e.preventDefault();
+    game.time.events.newFrame();
 	if(game.score[0] != game.score[1] && confirm('Continue to the next frame?')){
 		game.frames[game.currentFrame].push([game.currentPlayerTurn, game.currentTurnPoints]);
 		game.scoreByFrames.push([game.score[0], game.score[1]]);
@@ -251,14 +414,35 @@ $(document).on('click', '.next-frame-bt', function(e){
 	}
 });
 
+$(document).on('click', '.one-timer.timer-game', function(e){
+    if(confirm('Really reset game time?')){
+        game.time.interval.end();
+        game.time.events.startGame();
+        game.time.interval.start();
+        game.time.interval.handle();
+    }
+});
+$(document).on('click', '.one-timer.timer-frame', function(e){
+    if(confirm('Really reset frame time?')){
+        game.time.interval.end();
+        game.time.events.newFrame();
+        game.time.interval.start();
+        game.time.interval.handle();
+    }
+});
+
 $(document).on('click', '.ball', function(e){
 	e.preventDefault();
+
 	var wasPlayerTurn = game.currentPlayerTurn;
 	var td = $(this).closest('td');
 	var playerIndex = 0;
 	var points = parseInt($(this).attr('rel'));
 	var opt = {};
-	
+
+    var lastTurnPoints = 0;
+    $.each(game.currentTurnPoints, function(a,b){ lastTurnPoints += b>0 ? b : 0; });
+
 	if(td.hasClass('right')){
 		playerIndex = 1;
 	}
@@ -288,6 +472,7 @@ $(document).on('click', '.ball', function(e){
 		}
 	}
 	if(wasPlayerTurn !== playerIndex){
+        game.time.events.changePlayer();
 		//if(game.currentTurnPoints.length)
 			game.frames[game.currentFrame].push([wasPlayerTurn, game.currentTurnPoints]);
 		game.currentPlayerTurn = playerIndex;
@@ -300,6 +485,7 @@ $(document).on('click', '.ball', function(e){
 		//opt.speechScore = 1;
 
 	} else {
+        game.time.events.playerShot();
 		game.currentTurnPoints.push(points);
 		var tmp = 0;
 		$.each(game.currentTurnPoints, function(a,b){ tmp += b>0 ? b : 0; });
@@ -311,6 +497,20 @@ $(document).on('click', '.ball', function(e){
 	if(game.currentTurnPoints.length == 1 && game.currentTurnPoints[0] == 0){
 		opt.speechScore = 1;
 	}
+
+    if($(this).hasClass('play')){
+        if(lastTurnPoints){
+            if(!game.currentPlayerTurn){
+                var playerTwoName = $('.sb .player-2 .name').text().latinise();
+                game.audioPlay({type: 'player', name: playerTwoName.replace(' ', '_'), alt: 'player_two'});
+                game.audioPlay({type: 'point', name: lastTurnPoints});
+            } else {
+                var playerOneName = $('.sb .player-1 .name').text().latinise();
+                game.audioPlay({type: 'player', name: playerOneName.replace(' ', '_'), alt: 'player_one'});
+                game.audioPlay({type: 'point', name: lastTurnPoints});
+            }
+        }
+    }
 	game.updateScore(opt);
 
 });
@@ -578,9 +778,9 @@ $(document).on('keydown', function(e){
 	}
 });
 
-$('input[name="n1"]').val('Robo').trigger('change');
-$('input[name="n2"]').val('Miso').trigger('change');
+//$('input[name="n1"]').val('Robo').trigger('change');
+//$('input[name="n2"]').val('Miso').trigger('change');
 $('input[name="ft"]').val('5').trigger('change');
 
-$('input[name="n1"]').focus();
+//$('input[name="n1"]').focus();
 game.updateScore();
